@@ -1,7 +1,10 @@
+// import Express.js library (web app framework for node.js)
 const express = require("express");
 
+// import Pool class from postgre client library for nodejs
 const { Pool } = require("pg");
 
+// creating express app which will befine routes and middleware for the server
 const app = express();
 const port = 5000;
 
