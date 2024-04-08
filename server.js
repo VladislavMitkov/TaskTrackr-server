@@ -2,8 +2,11 @@
 const express = require("express");
 const res = require("express/lib/response");
 
+const cors = require("cors");
 // creating express app which will define routes and middleware for the server
 const app = express();
+
+app.use(cors({ origin: true, credentials: true }));
 
 // Define a route handler for the root URL ("/")
 app.get("/", (req, res) => {
