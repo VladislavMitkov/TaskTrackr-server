@@ -12,11 +12,13 @@ app.use(express.json());
 const tasks = [
   {
     id: 1,
+    fire: "true",
     title: "Task 1",
     description: "Description for Task 1",
     priority: "low",
     status: "todo",
     dueDate: "2024-04-30",
+    price: 1,
   },
   {
     id: 2,
@@ -25,6 +27,7 @@ const tasks = [
     priority: "medium",
     status: "in-progress",
     dueDate: "2024-05-05",
+    price: 12,
   },
   {
     id: 3,
@@ -33,6 +36,7 @@ const tasks = [
     priority: "high",
     status: "done",
     dueDate: "2024-04-25",
+    price: 52,
   },
   {
     id: 4,
@@ -41,6 +45,7 @@ const tasks = [
     priority: "low",
     status: "todo",
     dueDate: "2024-05-10",
+    price: 100,
   },
   {
     id: 5,
@@ -49,9 +54,9 @@ const tasks = [
     priority: "high",
     status: "in-progress",
     dueDate: "2024-04-28",
+    price: 26,
   },
 ];
-
 // Define a route handler for the root URL ("/")
 app.get("/", (req, res) => {
   const payload = req.body;
@@ -60,17 +65,25 @@ app.get("/", (req, res) => {
 });
 
 app.get("/tasks", (req, res) => {
-  const filterTasks = (task) => {
-    //we iterates over each KEY in the query Params
-    for (const key in req.query) {
-      if (task[key] !== req.query[key]) {
-        return false;
-      }
-    }
-    return true;
-  };
-  const filteredTasks = tasks.filter(filterTasks);
-  res.send(filteredTasks);
+  let { price, ...otherQueryParams } = req.query;
+  let filterByPrice;
+
+  const filteredTasks = tasks.filter((task) => {
+    return Object.keys(otherQueryParams).every(
+      (key) => task[key] === otherQueryParams[key]
+    );
+  });
+  if (price && price === "low") {
+    filterByPrice = filteredTasks.filter((t) => t.price <= 50);
+  } else if (price && price === "high") {
+    filterByPrice = filteredTasks.filter((t) => t.price > 50);
+  }
+
+  if (price) {
+    res.send(filterByPrice);
+  } else {
+    res.send(filteredTasks);
+  }
 });
 
 //get the full list of your tasks
