@@ -8,11 +8,82 @@ const app = express();
 app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
 
+// DUMMY DATA
+const tasks = [
+  {
+    id: 1,
+    fire: "true",
+    title: "Task 1",
+    description: "Description for Task 1",
+    priority: "low",
+    status: "todo",
+    dueDate: "2024-04-30",
+    price: 1,
+  },
+  {
+    id: 2,
+    title: "Task 2",
+    description: "Description for Task 2",
+    priority: "medium",
+    status: "in-progress",
+    dueDate: "2024-05-05",
+    price: 12,
+  },
+  {
+    id: 3,
+    title: "Task 3",
+    description: "Description for Task 3",
+    priority: "high",
+    status: "done",
+    dueDate: "2024-04-25",
+    price: 52,
+  },
+  {
+    id: 4,
+    title: "Task 4",
+    description: "Description for Task 4",
+    priority: "low",
+    status: "todo",
+    dueDate: "2024-05-10",
+    price: 100,
+  },
+  {
+    id: 5,
+    title: "Task 5",
+    description: "Description for Task 5",
+    priority: "high",
+    status: "in-progress",
+    dueDate: "2024-04-28",
+    price: 26,
+  },
+];
 // Define a route handler for the root URL ("/")
 app.get("/", (req, res) => {
   const payload = req.body;
   console.log(payload);
   res.send("Welcome to Planner App Backend");
+});
+
+app.get("/tasks", (req, res) => {
+  let { price, ...otherQueryParams } = req.query;
+  let filterByPrice;
+
+  const filteredTasks = tasks.filter((task) => {
+    return Object.keys(otherQueryParams).every(
+      (key) => task[key] === otherQueryParams[key]
+    );
+  });
+  if (price && price === "low") {
+    filterByPrice = filteredTasks.filter((t) => t.price <= 50);
+  } else if (price && price === "high") {
+    filterByPrice = filteredTasks.filter((t) => t.price > 50);
+  }
+
+  if (price) {
+    res.send(filterByPrice);
+  } else {
+    res.send(filteredTasks);
+  }
 });
 
 //get the full list of your tasks
@@ -23,8 +94,9 @@ app.get("/tasks", (req, res) => {
 
 //get a single task by Id
 app.get("/tasks/:id", (req, res) => {
-  console.log("Task by id");
-  res.send("get");
+  const taskId = req.params.id;
+  console.log("Task by id", taskId);
+  res.send("Task with id: " + taskId);
 });
 
 //make a POST request to add task
